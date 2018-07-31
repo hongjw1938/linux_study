@@ -25,6 +25,7 @@
     - ps : 실행중인 process를 보여준다.
         - ps ax : 모든 프로세스를 볼 수 있다.(u까지 넣으면 자세하게 보여줌)
         - -o : 실행시 특정 칼럼만 출력시킬 수 있다.
+    - head, tail : 앞의 뒷의 내용을 일부만 출력
     - history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head -10 : 내가 쳤던 명령어 history를 빈도수에 따라 정렬해서 보여줌
 - 명령어 사용법을 확인하는 방법
     - --help를 특정 명령어 뒤에 지정한다.
@@ -100,3 +101,42 @@
     - 예를 들어, grep을 이용해 특정 정보를 가진 행만을 화면에 보여주고 싶은 경우
     - `ls --help | grep sort` : ls의 manual 결과를 가지고 해당 내용에서 sort라는 정보를 가진 행만 출력해준다.
 ### 6. IO Redirection
+- I : input, O : output 으로 입출력을 의미하며, redirection은 방향을 바꾼다는 의미다.
+    - input과 output은 standard한 방식이 존재한다.
+    - 표준 입력 및 출력이며, error의 경우에도 존재한다.
+- process는 기본적으로 입력과 출력을 갖는다.
+    - 예를 들어, `ls -al` 이라면 -al은 입력값이다.(command line arguments)
+    - 또한 해당 결과를 화면에 보여주는데, 이것이 standard output
+    - 이 standard output의 방향을 바꾸어서 파일로 redirection이 가능하다.
+- > : 이 기호를 통해서 출력할 결과를 특정 파일에 저장할 수 있다.
+    - `ls -l > result.txt` : cat result.txt를 통해 내용이 저장된 것을 확인가능
+    - 해당 기호는 기본적으로 앞에 1이 생략되어 있기 때문에 standard output을 저장하는 방식이다.
+    - 만약 standard error를 저장하고 싶다면 2로 지정해야 한다.
+    - ex) rename2.txt를 삭제한 후 다시 삭제하는 경우
+        - 에러가 발생한다.
+        - 해당 내용을 단순히 > 를 이용해 다른 파일에 저장하려하면 저장되지 않는다.
+        - 왜냐하면 그것은 standard error가 아닌 output을 저장하는 방식이기 때문
+        - 따라서, `rm rename2.txt 2> error.log`로 해야 한다. 따라서 아래와 같이 쓴다.
+        - `rm rename2.txt > result.txt 2> error.log`
+- Input
+    - program arguments : control information
+    - environment arguments : state information
+    - standard input
+        - standard input은 keyboard로 사용자가 입력한 내용을 의미한다.        
+        - cat 명령어
+            - 기존에는 파일의 내용을 보여줬다.
+            - 단순히 cat만 쓰고 enter를 누르면 사용자가 keyboard로 input한 내용을 보여준다.
+            - 따라서 표준 입력을 받을 수 있는 명령어 이므로 < 를 통해 파일명을 지정할 수 있다.
+            - ex)만약, hello.txt에 hello라는 내용만 들어있다고 가정한다.
+                - 해당 내용을 보기 위해서 cat hello.txt로 바로 볼 수도 있지만
+                - cat < hello.txt로 내용을 볼 수 도 있다. 표준 입력!
+        - head 
+            - head -n1 linux.txt라고 하면 1줄만 출력한다.
+                - 이 방식은 command line argument로 명령어의 인자로 준 것이다.
+                - 만약? standard input으로 주고 싶다면??
+            - head -n1 < linux.txt로 사용한다.
+                - 즉, linux.txt의 내용을 standard input으로 redirection하여 head라는 process의 입력값이 된다.
+                - 그렇다면, 위 내용을 결과로 저장하고 싶다면?
+            - head -n1 < linux.txt > one.txt
+                - 즉, 해당 결과를 one.txt에 저장할 수 있다.
+- 지금까지 한 내용처럼 input과 output으로 넘기는 것을 stream이라고 한다. 
