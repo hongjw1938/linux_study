@@ -108,13 +108,13 @@
     - 예를 들어, `ls -al` 이라면 -al은 입력값이다.(command line arguments)
     - 또한 해당 결과를 화면에 보여주는데, 이것이 standard output
     - 이 standard output의 방향을 바꾸어서 파일로 redirection이 가능하다.
-- > : 이 기호를 통해서 출력할 결과를 특정 파일에 저장할 수 있다.
+- `>` : 이 기호를 통해서 출력할 결과를 특정 파일에 저장할 수 있다.
     - `ls -l > result.txt` : cat result.txt를 통해 내용이 저장된 것을 확인가능
     - 해당 기호는 기본적으로 앞에 1이 생략되어 있기 때문에 standard output을 저장하는 방식이다.
     - 만약 standard error를 저장하고 싶다면 2로 지정해야 한다.
     - ex) rename2.txt를 삭제한 후 다시 삭제하는 경우
         - 에러가 발생한다.
-        - 해당 내용을 단순히 > 를 이용해 다른 파일에 저장하려하면 저장되지 않는다.
+        - 해당 내용을 단순히 `>` 를 이용해 다른 파일에 저장하려하면 저장되지 않는다.
         - 왜냐하면 그것은 standard error가 아닌 output을 저장하는 방식이기 때문
         - 따라서, `rm rename2.txt 2> error.log`로 해야 한다. 따라서 아래와 같이 쓴다.
         - `rm rename2.txt > result.txt 2> error.log`
