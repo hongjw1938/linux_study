@@ -177,3 +177,53 @@
 - kernel
     - 하드웨어를 제어하여 명령을 수행한다.
 - 왜 커널과 쉘은 분리되어 있을까?? 찾아보자.
+### 8. 디렉토리의 구조
+- <a href="https://www.thegeekstuff.com/2010/09/linux-file-system-structure">참조</a>
+- 각 디렉토리
+    - / 
+        - root directory, 최상위 디렉토리
+    - /bin
+        - binary의 줄임말이며 2진수라는 의미이다.
+        - 실행가능한 프로그램을 컴퓨터에서는 binary라고도 부른다.
+        - 이곳에는 사용자가 실행가능한 명령어 프로그램이 위치한다.
+    - /sbin
+        - System binaries를 의미한다.
+        - 이 또한 바이너리 프로그램이 위치함.
+        - system administrator가 사용하는 프로그램이 위치한다. 일반사용자가 이용하는 것은 /bin에 위치
+    - /etc
+        - 설정파일이다.
+        - 대부분의 프로그램의 설정은 파일을 변경하는 곳.
+        - 이미 설치된 프로그램, 운영체제의 설정을 건드릴 수 있음.
+    - /dev
+        - device files
+    - /proc
+        -  process information
+    - /var
+        - variable files로 용량이 바뀔 수 있다는 것.
+        - 즉, 내용이 변경될 수 있는 파일들이 위치하고 있다.
+    - /tmp
+        - 임시파일이 저장됨. 종료 후 다시 켜면 다 삭제됨.
+    - /home
+        - 사용자들의 directory
+        - home directory아래에 각 사용자들의 파일이 저장될 수 있도록 각 디렉토리가 존재할 수 있다.
+        - 어디에 위치하건 나의 home directory로 이동해야할 경우가 많이 있다.
+        - cd /home/ubuntu와 같이도 가능하지만, cd ~를 이용하면 현재 사용자의 home 디렉토리로 한번에 이동가능하다.\
+    - /boot
+    - /lib
+        - /bin과 /sbin에 위치하는 프로그램이 공통으로 사용하는 라이브러리가 위치함.
+    - /opt
+        - Optional add-on Applications
+        - 일반적으로 apt-get을 통해 패키지를 다운로드 받으면 특정 디렉토리에 위치하게 된다.
+        - 이 것을 사용자 지정 디렉토리로 설정하고 싶을 때, 애매한 경우 Opt에 놓으면 된다.
+    - /mnt
+    - /media
+    - /srv
+    - /usr
+        - 사용자 프로그램이 저장되는 디렉토리이며 내부에 아래와 같이 분화되어 있다.
+        - /bin
+        - /sbin
+        - /lib
+        - /local
+        - 역사적인 맥락에 따라서, 기존에는 필요했던 부분이지만 지금은 거의 통합되어 잘 사용하지 않기도 함.
+        - 지금은 home directory에 각 유저의 프로그램이 위치.
+### 9. 프로세스
