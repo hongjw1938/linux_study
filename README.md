@@ -28,6 +28,7 @@
         - ps ax : 모든 프로세스를 볼 수 있다.(u까지 넣으면 자세하게 보여줌)
         - -o : 실행시 특정 칼럼만 출력시킬 수 있다.
     - head, tail : 앞의 뒷의 내용을 일부만 출력
+    - !! : 직전에 사용한 명령어
     - history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head -10 : 내가 쳤던 명령어 history를 빈도수에 따라 정렬해서 보여줌
 - 명령어 사용법을 확인하는 방법
     - --help를 특정 명령어 뒤에 지정한다.
@@ -374,3 +375,89 @@
         - 현재 시스템에 접속한 유저를 확인할 수 있다.
         - ssh를 이용해 원격접속을 하면 who를 통해 접속자를 알아낼 수 있다.
         - exit를 해서 빠져나가면 who로 더이상 확인할 수 없다.
+### 16. 관리자, 일반사용자
+- 관리자(super user, root user)
+    - 지금까지 권한을 얻기 위해서 `sudo`즉, super user의 do를 이용하였다.
+    - 그러나, 이는 아무나 할 수는 없는 것이다.(root유저가 될 수 있으나 평시에 일반 권한으로 사용하는 자만 가능)
+    - 일반적으로 super user는 root라는 이름을 가진다. 또한 command의 line에서 $가 아닌 #이 된다.
+    - 슈퍼 유저가 되는 법
+        - `su -` : su는 substitute user로 유저를 바꾸는 것이다. su - root라고 해도 된다.
+        - 빠져나갈 때는 exit. logout된다.
+    - `sudo passwd -u root` : root유저의 passwd를 unlock할 수 있다.
+    - `sudo passwd -l root` : lock을 거는 것이다. 이 때는 root유저가 될 수 없다.
+    - `sudo passwd root` : root유저의 비밀번호를 변경할 수 있다.
+    - root 사용자의 home directory는 /root이다.(일반 사용자는 접근 불가)
+- 일반사용자
+    - super user의 권한이 없는 유저이다.
+    - 일반사용자 중에서 sudo를 사용할 수 있는 유저는 제한되어 있다.
+    - sudo 권한이 있는 유저는 root접속시 `sudo su`를 통해 비밀번호 없이 접속가능하다.
+### 17. 사용자추가
+- 일반 사용자가 다른 일반사용자를 추가할 수 없다. sudo해야함
+- <a href="https://www.cyberciti.biz/faq/unix-create-user-account/">참조</a>
+- 추가
+    - `sudo useradd -m [user_name]` : user_name에 해당하는 user를 추가한다.
+    - 이 때, /home에서 ls해보면 사용자가 추가된 것을 알 수 있다.
+    - `sudo passwd [user_name]`을 통해서 비밀번호를 설정할 수 있다.
+    - 현재 새로 추가한 user는 sudo의 권한이 없다.
+    - sudo 권한을 주기 위해서는 `sudo usermod -a -G sudo [user_name]`과 같이 하면 된다.
+        > a는 append이며 -G는 Group에 추가한다는 것이다. 즉, sudo Group에 추가하는 것.
+
+    - 혹은, 애초에 만들 때 sudo 권한이 있도록 만든다. (`sudo adduser [user_name] sudo`)
+### 18. Permission
+- 사용자가 file 및 directory에 대해 read/write/execute할 수 있도록 혹은 없도록 할 수 있다.
+- 권한
+    - `ls -l`을 해보면 각 파일의 자세한 내용이 나온다. 아래와 같다.
+        > `-rw-rw-r-- 1 user user 0 Dec 4 23:19 aaa.txt`
+
+    - 맨 좌측의 -는 type을 의미한다.
+    - 그 뒤 1 전까지는 access mode
+        - 여기서 rw-는 owner의 권한, 그 뒤 rw-는 group의 권한, r-- 는 이외 사용자(other)의 권한
+        - r은 read, w 는 wrtie, x는 execute
+    - 1 뒤의 user는 owner이며 그 뒤 user는 group
+- 예시
+    - terminal을 여러개 켠다.
+    - 각 터미널 유저를 다르게 설정한다.
+    - a 유저가 본인의 home directory에서 특정 파일을 만들면, 그룹에 해당하지 않는 일반사용자는 쓰거나 실행할 수 없을것이다.
+    - 그 때, b유저가 해당 home directory에 접속하여 write를 하려고 하면 permission denied된다.
+- 권한을 변경하는 방법
+    - chmod라는 명령어를 사용한다. : change mode
+    - 사용 예시 : `chmod o+r [file]`
+        - 즉, 중간에는 사용권한에 대한 명시를 할 수 있다.
+        - +는 권한을 추가한다는 것이며, r은 권한을 의미한다. -는 당연히 권한을 없앤다는 것.
+        - o는 other사용자를 의미하며, u는 owner로 소유자를 의미한다.
+- 실행권한(execute)
+    - hi-machine.sh를 만들고 내부에 echo를 통해 내용을 추가해보자
+    - 현재는 권한이 없으므로 실행이 불가하다.
+    - 그러나 `/bin/bash hi-machine.sh`로 하면 실행이 가능하다.
+    - 실행권한을 위해서는 `chmod u+x hi-machine.sh`
+- 디렉토리의 권한
+    - 파일과 다르게 읽기 쓰기 실행이 불분명하다.
+    - read권한을 없애면 해당 디렉토리에 소속된 파일의 정보를 열람할 수 없다.
+    - write권한이 사라지면, 해당 디렉토리에 새로운 파일 혹은 directory를 만들 수 없다. 물론 rm, mv도 불가
+    - x권한은 cd명령으로 진입 가능하냐 불가하냐와 관련된 권한이다.
+    - 디렉토리의 depth가 깊은 경우 그 아래의 모든 디렉토리의 권한을 바꾸고 싶다면 -R이라는 옵션을 주면 된다.
+        - `chmod -R o+w [directory_name]`
+- chmod 명령어
+    - mode 변경시에 octal이라는 8진수를 이용해 지정할 수도 있다.
+        - `chmod 111 [file_name]` : 해당 파일의 권하을 xxx로만 바꾼다.
+        - 110이면 other사용자는 어떤 권한도 없다
+        - r은 4, w는 2, x는 1이므로 이 숫자를 조합하면 된다.
+    - 대상 지정시 u, g, o로 지정 가능
+        - u는 owner, g는 group, o는 other, a는 모든 사용자
+        - +는 권한 추가, -는 권한 삭제, =는 지정
+            - `chmod a=r [file_name]` : 모든 사용자에게 read권한만 준다.
+    - <a href="https://en.wikipedia.org/wiki/Chmod">참조</a>
+### 19. GROUP
+- group에 대한 권한
+    - 특정 user, other도 아니고 group으로 사용자들을 묶어 이름을 주고 파일에 대한 권한을 부여할 수 있다.
+    - groupadd라는 명령어로 그룹을 추가할 수 있다.
+        - `groupadd [option] [group_name]`로 사용
+        - /etc/group이라는 파일에서 group에 대한 정보를 확인할 수 있다.
+        - group을 추가했으면 user를 추가한다.
+    - usermod
+        - 사용자 account를 수정하는 명령어
+        - 그룹에 사용자를 추가하기 위해서는 다음과 같은 명령어를 쓴다.
+        - `sudo usermod -a -G [groupname] [username]` 
+    - chown
+        - file의 owner와 group을 바꾼다.
+        - `sudo chown [user_name]:[group_name]` : 유저 및 그룹을 바꾼다.
