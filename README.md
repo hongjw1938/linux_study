@@ -581,3 +581,23 @@
     - 내부 IP주소는 서버를 설치할 컴퓨터의 내부의 computer를 의미한다. 규칙이름은 원하는대로 하고, 외부 포트에는 route로 접근할 포트의 번호를 지정하는 것(범위 가능), 내부 포트는 서버가 설치된 컴퓨터의 포트를 의미한다.
     - 해당 내용에서 포트포워딩 실습이 가능. 강의 참조
     - <a href="https://opentutorials.org/course/2598/14470">참조</a>
+### 24. domain
+- hosts파일
+    - 만약 google.com으로 접속하면 /etc/hosts를 먼저 살피고 그거를 접속하고, 만약 존재하면, DNS에는 접속하지 않는다.
+    - 그래서 /etc/hosts라는 파일은 host들의 ip를 적어놓는 파일이다. 즉, host들의 name을 ip로 적어놓는것.
+    - 예전에는 이것을 거의 썼지만, 지금은 host가 너무 거대해졌기 때문에 그를 본질적으로 해결하기 위해 DNS를 사용하는 것이다.
+    - 일시적으로 특정 domain의 ip를 변조해서 써야할 경우가 있을 때 매우 편리하다. 이때문에 크래커들의 공격대상이 된다.
+    - 
+- DNS
+    - Domain Name Server
+    - cat /etc/resolv.conf 를 해보면, nameserver가 여러개 있을 것이다.
+    - 이것이 ISP의 DNS서버임. 여러개 있는 이유는 부하분산, 백업을 위해
+    - 이제 우리 서버에 접속하게 하기 위해서는 이 DNS에 우리 ip를 지정해야 하는데, 그를 위해서는 domain을 구입해야 한다.
+    - 무료를 원하면 google에 free domain을 검색하자
+    - 구매를 한 다음, 사용하고 싶은 IP주소를(curl ipinfo.io/ip의 퍼블릭으로 해야함), domain name에 setting시킨다.(DNS서버들은 이제 나의 domain이 어떤 ip인지 알게 됨)
+    - host [my_domain] : 이를 해보면 DNS서버가 이제 인식하고 있는지를 확인할 수 있다.(시간이 걸림)
+- 서브 도메인
+    - 여러 개의 서버가 있을 때, 각각의 domain을 사야 할까? 가격이 부담된다.
+    - 그래서 기존의 domain을 이용해 여러번 사용할 수 있도록 지정할 수 있다.
+    - 이것이 서브 도메인인데 DNS management를 해주는 사이트에서
+    - add record를 통해서 이름을 blog.[my_domain], site.[my_domain]과 같이 지정하여 서로 다른 ip에 여러가지 서브 도메인을 줄 수가 있다.
