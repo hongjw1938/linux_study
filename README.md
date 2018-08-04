@@ -498,3 +498,86 @@
     - 같은 공유기를 사용하는 기기들은 서로간에 통신이 가능하다.
     - 그리고 라우터를 설정함에 따라 공용 ip를 통해 특정 기기에 접속하는 것도 가능하다.
     - 이외의 방법도 존재
+### 21. 웹서버(아파치)
+- 설치
+    - `sudo apt-get install apache2`
+    - 무엇으로 설치해야 할지 모르겠으면 검색하거나, `sudo apt-cache search apache`해본다.
+- 시작
+    - `sudo service apache2 start`
+    - `sudo service apache2 restart`
+- 정지
+    - `sudo service apache2 stop`
+- shell에서 직접 접속하기(웹 브라우징)
+    - `sudo apt-get install elinks` : elinks를 설치하고 실행
+    - elinks -> 바로 웹 브라우저에서 하듯이 접속하여 활동할 수 있다.
+    - `elinks http://[ip_address]/`
+- localhost로 접속하기
+    - 자기 자신의 컴퓨터에 설치된 서버에 접속하는 경우
+    - 127.0.0.1과 localhost는 같은 것.(자기 자신을 가리키는 ip이다)
+    - `elinks 127.0.0.1`로도 자신의 컴퓨터의 서버에 접속할 수 있다.
+    - 혹은 `elinks http://localhost`로도 가능
+- 웹서버 configuration
+    - /etc에는 다양한 설정파일이 존재함.
+    - /etc/apache2/conf에 보면 다양한 설정내용이 있을 것이다.
+    - 해당 내용의 아래쪽에 보면 `IncludeOptional sites-enabled/*.conf`와 같이 되어 잇다.(버전마다 다를 수 있다.)
+    - 그 내용은 해당 디렉토리의 .conf라는 파일을 모두 읽어서 사용한다는 것.
+    - 해당 디렉토리에 가보면 000-default.conf로 link가 걸려있을 것이다.
+    - 해당 파일을 열어보면 `DocumentRoot /var/www/html`이라고 되어 있는데, 그 디렉토리에 들어가보면
+    - 기본적으로 index.html파일이 존재할 것이다. 그 파일의 이름을 바꾸고 `elinks http://127.0.0.1/index.html`을 해보면 찾을 수 없다고 할 것이다.
+    - 다시 index.html파일을 만들어 접속해보면 동작할 것이다.
+    - 즉!, /etc/apache2의 여러 설정을 참고하여 사용자의 접속이 들어오면 storage안에 있는 어디에서 파일을 뒤질 것인가를 알아내고 response를 보내는 것이다.
+    - 이렇게 사용자가 요청한 파일을 찾는 최상위 디렉토리가 document root이다.(/var/www/html)
+- log
+    - 000-default.conf에 중간에 보면 error.log, access.log파일에 error, customlog파일이 있을 것이다.
+    - 해당 파일들은 /var/log/apach2에 존재한다.
+    - 해당 내용 중 access.log는 웹서버에 접속할 때마다 로그가 추가된다.
+    - 따라서, 해당 로그를 통해서 다양한 정보를 얻을 수 있고 이를 통해 대부분의 문제를 해결할 수 있다.
+### 22. SSH(매우 중요)
+- SSH?
+    - 원격제어를 할 경우에 사용된다.
+    - 오늘 날, 리눅스 시스템을 데스크탑 대용으로 쓰는 경우는 많지 않다.
+    - shell을 통해서 서버를 제어하는 것.
+    - 이를 위해선 client-server구조가 필요하다.
+    - SSH Client - SSH Server가 상호 작용.
+    - SSH Client에서 rm, ls, pwd와 같은 명령어를 입력하면 자신의 컴퓨터를 제어하는 것이 아니라, SSH Server에 전달되고 그 Server는 자신의 컴퓨터에 동작시키고 그 결과를 받아 Client에 표시한다.
+- 설치
+    - `sudo apt-get install openssh-server openssh-client`
+    - `sudo service ssh start`
+    - `sudo ps aux | grep ssh`
+- 접속
+    - 현재, 컴퓨터는 SSH SERVER가 설치된 상태이고 해당 서버는 계속 실행되다가 Client의 접속을 기다린다.
+    - ip addr을 해서 현재 SERVER가 설치된 컴퓨터의 ip address를 알아본다.
+    - `ssh [user_name]@[ip_address]` : 이를 통해 원격 접속이 가능하다.
+    - 이제 이 상태에서는 Client가 있는 컴퓨터에서는 원격으로 접속하였으므로 명령을 내리면 본인 컴퓨터가 아닌 원격 컴퓨터를 제어하는 것이 된다.
+### 22. 포트
+- 포트
+    - www.naver.com은 그냥도 가능하지만 www.naver.com:80으로도 접속된다.
+    - 하지만 다른 것으로는 안된다. 그것이 포트, web은 80번 포트를 쓴다.
+    - SSH접속시 `ssh -p [port_num] [ip_address]`로 접속할 수 있다.
+    - ssh일 때는 22로 입력하면 접속된다. ssh는 22번 포트를 사용하기 때문이다.
+    - 포트는 구멍이라고 생각하자. 0~65xxx번 까지 존재한다.
+        - ssh는 22번으로 연결되도록 약속되어 있으며, webserver는 80번으로 약속되어 있다!
+        - 그래서 웹 브라우저로 서버에 접속시에 주소에 :80을 추가하지 않더라도 알아서 80번 port를 찾아가서 서버에 접속한다.
+    - ssh의 경우 /etc/ssh/sshd_config에 보면 port 22라고 적혀있으니 해당 번호를 바꿀 수 있다.
+    - 그 번호를 바꾸고 ssh restart를 하면 바꾼 설정이 반영된다.
+    - 이제는 기존 방식으로는 접속이 안된다. -p 2222로 접속해야 한다.
+    - 이 포트번호를 변경함으로써 사용자가 다른 포트번호로 접속하도록 만들 수 있다.
+- 포트 포워딩(port forwarding)
+    - ISP(인터넷 서비스 공급자)와 계약하여 한 가정이 여러 기기를 인터넷에 접속하는 데, 이 때 대부분 router를 사용할 것이다.
+    - 그러면, 이 공유기(라우터)를 이용하여 케이블로 연결하거나, 무선으로 연결하여 하나의 회선을 사용한다.
+    - 이 때, ISP에서 제공하는 public ip address가 있는데, 이것이 한 예로 *211.46.24.37*이라고 가정하면, 이 ip는 router의 ip가 된다.
+    - 각각의 공유기를 이용하는 기기는 192.168.0.2 / 0.3 / 0.4와 같은 ip를 부여받는다고 하자.(private ip address)
+    - 이 때, 외부의 다른 유저는 공유기 ip를 알면 접속이 가능하지만, 사설 ip로는 접속할 수는 없다. 기본적으로는
+    - 그렇다면, 어떻게 접근할 수 있도록 할까? 그것이 포트 포워딩을 통해 가능하다.
+- 포트포워딩의 이란?
+    - router에도 당연히 port가 존재하며, 사설 ip로 연결된 컴퓨터에 서버가 있으면 당연히 port가 있다.
+    - 그러면, router로 특정포트로 누군가 접속하면, 그 접속을 어떠한 특정한 computer로 전달한다. 이것이 포트 포워딩
+    - 예를 들어, 사용자가 9000번 포트로 router에 접근했다면, router의 설정을 열어서 9000 ---> 192.168.0.4:80으로 설정을 지정하는 것이다.
+    - 공유기마다 환경설정 방법은 다르다. 직접 알아봐야 함.
+    - 이와 같이 공유기 안쪽에서만 통용되는 ip를 default gateway라고 부른다.(공유기는 관문과 같은 역할이라고 보면 된다.)
+- default gateway
+    - 공유기의 제조사마다 다른데 해당 gateway ip를 통해 브라우저에 접속하면 공유기 설정이 가능한 곳으로 접속된다.
+    - 관리도구 - 고급설정 - NAT라우터설정 - 포트포워드 설정에서 설정가능
+    - 내부 IP주소는 서버를 설치할 컴퓨터의 내부의 computer를 의미한다. 규칙이름은 원하는대로 하고, 외부 포트에는 route로 접근할 포트의 번호를 지정하는 것(범위 가능), 내부 포트는 서버가 설치된 컴퓨터의 포트를 의미한다.
+    - 해당 내용에서 포트포워딩 실습이 가능. 강의 참조
+    - <a href="https://opentutorials.org/course/2598/14470">참조</a>
