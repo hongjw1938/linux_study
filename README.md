@@ -628,3 +628,41 @@
     - 이를 위해서는 ip addr을 통해서 sync시킬 컴퓨터의 ip를 알아야 한다.
     - `rsync -azP ~/rsync/src/ [user_name]@[ip_address]:[directory]` : 다른 컴퓨터의 사용자의 ip에 맞게 지정해 특정 디렉토리로 rsync를 하는 것이다.
     - z는 압축이며, P는 전송되는 상황을 progress bar로 보여준다.
+### 26. ssh공개키
+- 로그인 없이 로그인하기
+    - 두 대의 linux환경을 준비하자
+    - 우선 ssh공개키, 개인키를 만들어야 한다. : `ssh-keygen`
+    - 만들면, *~/.ssh/id_rsa*의 파일의 형태로 내용이 저장된다.(비밀번호 안해도 됨)
+    - .ssh로 가보면 id_rsa, id_ras.pub으로 두 개의 파일이 중요하다.
+    - 전자는 private key이며, 후자는 public key이다.(private key는 절대 노출되어선 안된다.)
+    - 이 때, 공개키가 저장되어 있는 컴퓨터에 로그인 없이 접속이 가능해진다.
+    - `authorized keys`라는 내용의 파일도 있는데 이 내용에, public key 내용을 복사해서 끝에 붙여주면 된다.
+    - `ssh-copy-id [user_name]@[ip_address]`를 하면 로그인을 시도하고자 하는 컴퓨터의 authorized keys파일의 끝에 퍼블릭 키가 추가된다.
+    - 이 때, 공개키를 만든 컴퓨터에서 다른 로그인하고자 하는 컴퓨터에 바로 접속이 가능해진다.(공개키가 추가되었기 때문)
+    - 접속시에는 `ssh [user_name]@[ip_address]`를 통해 접속된다.
+- rsync동기화
+    - `rsync -avz . [user_name]@[ip_address]:[directory]`
+    - 현재 디렉토리의 내용을 다른 컴퓨터에 바로 sync가 가능하다.
+    - 이를 수행할 때, 비밀번호가 없이 되는 이유는, ssh공개키를 통해 인증이 되었기 때문이다.
+    - 이 과정을 자동으로 하기 위해서 cron을 이용하면 정기적으로 backup을 자동화처리할 수 있다.
+- RSA
+    - 암호화기법이다.
+        - 정보를 필요한 사람만 알 수 있도록 이해할 수 없는 형태로 변경가능한데 이것이 encrypt, 즉 암호화이다.
+        - 해당 내용을 원래 상태로 돌리는 것을 decrypt, 즉 복호화이다.
+        - 그래서 key를 이용하여 암호화를 하고 복호화를 할 수 있다.
+        - 만약 이 과정에서 같은 key를 쓰면 대칭적 방식!
+        - 암호화를 private key, 복호화를 public key를 써서 하면 비대칭방식 : 이 대표주자가 RSA!
+    - RSA방식
+        - SSH client가 SSH server에 접속하게 되면, 서버는 random하게 생성한 key를 client에게 준다.
+        - client program은 .ssh라는 directory에서 id_rsa를 찾아서 random key를 암호화한다.
+        - 다시 SSH server에 암호화된 내용을 보내주게 되고, server에서는 authorized keys에 저장된 공개키를 통해 복호화한다.
+        - 복호화된 결과가 자신이 처음 전송했던 random key와 같다면!, ssh client가 권한이 있는 유저임을 확신할 수 있다.
+        - 그래서 로그인을 안전하게 할 수 있는 것이다.
+### 추가
+- ; - 앞의 명령어가 실패해도 다음 명령어가 실행(앞의 명령어의 성공여부 무관)
+- && - 앞의 명령어가 성공했을 때 다음 명령어가 실행(앞의 명령어 성공이 반드시 수반돼야)
+- & - 앞의 명령어를 백그라운드로 돌리고 동시에 뒤의 명령어를 실행
+    - 그래서 `mkdir test & cd test`에서 cd는 동작되지 않는다. 동시에 수행하려고 하기 때문.
+- 명령의 그룹핑 : {}
+    - `mkdir test3 && { cd test3; touch abc; echo 'success!!' } || echo 'There is no dir';`
+    - mkdir test가 성공했을 때 cd test2; touch abc를 실행하고 success!!를 출력합니다.  실패했을 때 echo 'There is no dir'를 실행합니다.  이때 실행되는 명령들은 현재 쉘의 컨텍스트에서 실행됩니다. 만약 서브 컨텍스트에서 실행하고 싶다면 '('와 ')'를 사용하시면 됩니다. (참고)
